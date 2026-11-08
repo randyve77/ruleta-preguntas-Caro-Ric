@@ -1,534 +1,303 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruleta de Preguntas Diarias</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            min-height: 100vh;
-        }
-
-        /* Estilos de la rueda en Canvas */
-        #wheelCanvas {
-            transition: transform 4s cubic-bezier(0.15, 0.99, 0.15, 0.99);
-            transform-origin: center center;
-        }
-
-        /* Indicador / Puntero flotante con sombra */
-        .wheel-pointer {
-            filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.4));
-        }
-
-        /* Scrollbar personalizada para la lista */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-    </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2775.1">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
 </head>
-<body class="text-slate-100 font-sans p-4 md:p-8 flex flex-col items-center justify-start min-h-screen">
-
-    <!-- Toast Notification (Reemplazo de alert) -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 ease-in-out bg-slate-800 text-white border border-slate-700 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-        <i id="toastIcon" class="fas fa-info-circle text-indigo-400"></i>
-        <span id="toastMessage" class="text-sm font-medium">Notificación</span>
-    </div>
-
-    <!-- Header Principal -->
-    <header class="text-center max-w-2xl mb-6">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3">
-            <i class="fas fa-sparkles"></i> Tu momento del día
-        </div>
-        <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
-            Ruleta de Preguntas Diarias
-        </h1>
-        <p class="text-slate-400 text-sm md:text-base mt-2">
-            Gira la ruleta cada día para obtener un pensamiento, reto o reflexión personal. ¡Solo 1 intento diario!
-        </p>
-    </header>
-
-    <!-- Contenedor Principal en Grid -->
-    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        <!-- SECCIÓN DE LA RULETA (Izquierda / Centro) -->
-        <section class="lg:col-span-7 flex flex-col items-center bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-2xl relative">
-            
-            <!-- Indicador superior (Puntero) -->
-            <div class="relative flex flex-col items-center z-20 mb-[-20px]">
-                <div class="wheel-pointer w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[32px] border-t-rose-500"></div>
-            </div>
-
-            <!-- Contenedor del Canvas -->
-            <div class="relative w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[400px] md:h-[400px] flex items-center justify-center my-2">
-                <canvas id="wheelCanvas" width="400" height="400" class="w-full h-full rounded-full shadow-2xl"></canvas>
-                <!-- Centro de la rueda -->
-                <div class="absolute w-12 h-12 bg-slate-900 border-4 border-slate-700 rounded-full shadow-inner flex items-center justify-center pointer-events-none z-10">
-                    <i class="fas fa-star text-amber-400 text-sm"></i>
-                </div>
-            </div>
-
-            <!-- Botón de Giro -->
-            <div class="mt-6 w-full max-w-xs text-center">
-                <button id="spinBtn" onclick="spinWheel()" 
-                    class="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none flex items-center justify-center gap-3">
-                    <i class="fas fa-sync-alt text-xl" id="spinIcon"></i>
-                    <span id="spinBtnText">¡Girar Ruleta!</span>
-                </button>
-                <p id="spinStatusText" class="text-xs text-slate-400 mt-2 font-medium">Queda 1 giro disponible para hoy</p>
-            </div>
-
-            <!-- Tarjeta con la Pregunta Seleccionada -->
-            <div id="resultCard" class="w-full mt-6 bg-gradient-to-r from-slate-800 to-slate-800/80 border border-indigo-500/30 rounded-2xl p-5 text-center hidden transform transition-all duration-500">
-                <div class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1 flex items-center justify-center gap-2">
-                    <i class="fas fa-calendar-check"></i> Tu Pregunta de Hoy:
-                </div>
-                <h3 id="questionResult" class="text-xl md:text-2xl font-bold text-slate-100 leading-snug">
-                    <!-- Texto de la pregunta -->
-                </h3>
-            </div>
-
-        </section>
-
-        <!-- SECCIÓN DE ADMINISTRACIÓN Y GESTIÓN (Derecha) -->
-        <section class="lg:col-span-5 bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-md shadow-2xl flex flex-col h-full">
-            
-            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-                <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
-                    <i class="fas fa-[#818cf8] fa-list-check text-indigo-400"></i> Banco de Preguntas
-                </h2>
-                <span id="questionCount" class="text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-1 rounded-full border border-slate-700">
-                    0 preguntas
-                </span>
-            </div>
-
-            <!-- Formularios de adición -->
-            <form onsubmit="addQuestion(event)" class="mb-4 flex gap-2">
-                <input type="text" id="newQuestionInput" placeholder="Escribe una nueva pregunta..." 
-                    class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                <button type="submit" 
-                    class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1 shadow-md">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </form>
-
-            <!-- Lista con scroll para gestionar preguntas -->
-            <div class="flex-1 max-h-[320px] overflow-y-auto pr-1 space-y-2" id="questionsList">
-                <!-- Se llena mediante JS -->
-            </div>
-
-            <!-- Acciones de Control / Modo Demo -->
-            <div class="mt-6 pt-4 border-t border-slate-800/80 flex flex-col gap-2">
-                <button onclick="resetDailySpin()" 
-                    class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700/80 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
-                    <i class="fas fa-[#f59e0b] fa-rotate-left"></i> Reiniciar prueba diaria (Modo Demo)
-                </button>
-                <button onclick="restoreDefaultQuestions()" 
-                    class="w-full py-2 px-4 bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-slate-300 rounded-xl text-xs transition flex items-center justify-center gap-2">
-                    <i class="fas fa-trash-arrow-up"></i> Restablecer 10 preguntas iniciales
-                </button>
-            </div>
-
-        </section>
-
-    </main>
-
-    <footer class="mt-8 text-center text-xs text-slate-500">
-        Ruleta de Preguntas Diarias &bull; Tus datos se guardan de forma local en tu navegador.
-    </footer>
-
-    <!-- LOGICA JAVASCRIPT -->
-    <script>
-        // Lista por defecto de 10 preguntas motivacionales y reflexivas
-        const defaultQuestions = [
-            "¿Qué fue lo mejor que te pasó hoy?",
-            "¿Qué meta u objetivo quieres cumplir esta semana?",
-            "¿Qué gran aprendizaje te llevas del día de hoy?",
-            "¿Qué o quién te hizo sonreír hoy?",
-            "¿A quién puedes agradecerle algo especial hoy?",
-            "¿Qué hábito positivo quieres mejorar mañana?",
-            "¿Qué obstáculo o desafío lograste superar recientemente?",
-            "¿Qué actividad te hizo sentir lleno de energía hoy?",
-            "¿Cuál es tu mayor prioridad para el día de mañana?",
-            "¿Cómo te demostraste amor propio el día de hoy?"
-        ];
-
-        // Paleta de colores atractiva para los sectores de la ruleta
-        const sliceColors = [
-            "#6366f1", "#ec4899", "#8b5cf6", "#10b981", 
-            "#f59e0b", "#06b6d4", "#f43f5e", "#3b82f6", 
-            "#84cc16", "#d946ef"
-        ];
-
-        // Estado global
-        let questions = [];
-        let currentRotation = 0;
-        let isSpinning = false;
-
-        // Elementos DOM
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-        const spinBtnText = document.getElementById('spinBtnText');
-        const spinIcon = document.getElementById('spinIcon');
-        const spinStatusText = document.getElementById('spinStatusText');
-        const resultCard = document.getElementById('resultCard');
-        const questionResult = document.getElementById('questionResult');
-        const questionsList = document.getElementById('questionsList');
-        const questionCount = document.getElementById('questionCount');
-
-        // Inicialización
-        window.onload = function() {
-            loadQuestions();
-            drawWheel();
-            checkDailySpin();
-        };
-
-        // Cargar preguntas desde localStorage o cargar las predeterminadas
-        function loadQuestions() {
-            const saved = localStorage.getItem('daily_wheel_questions');
-            if (saved) {
-                try {
-                    questions = JSON.parse(saved);
-                } catch (e) {
-                    questions = [...defaultQuestions];
-                }
-            } else {
-                questions = [...defaultQuestions];
-                saveQuestionsToStorage();
-            }
-            renderQuestionsList();
-        }
-
-        // Guardar preguntas en localStorage
-        function saveQuestionsToStorage() {
-            localStorage.setItem('daily_wheel_questions', JSON.stringify(questions));
-        }
-
-        // Dibujar la ruleta en Canvas HTML5
-        function drawWheel() {
-            const numSlices = questions.length;
-            const width = canvas.width;
-            const height = canvas.height;
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const radius = width / 2 - 10;
-
-            ctx.clearRect(0, 0, width, height);
-
-            if (numSlices === 0) {
-                // Dibujar ruleta vacía
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#334155';
-                ctx.fill();
-                ctx.strokeStyle = '#475569';
-                ctx.lineWidth = 4;
-                ctx.stroke();
-
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = 'bold 16px Plus Jakarta Sans';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('Agrega al menos 1 pregunta', centerX, centerY);
-                return;
-            }
-
-            const sliceAngle = (2 * Math.PI) / numSlices;
-
-            for (let i = 0; i < numSlices; i++) {
-                const angle = i * sliceAngle;
-                
-                // Sector circular
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
-                ctx.closePath();
-                ctx.fillStyle = sliceColors[i % sliceColors.length];
-                ctx.fill();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = '#0f172a';
-                ctx.stroke();
-
-                // Renderizar Texto en el sector
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(angle + sliceAngle / 2);
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 12px Plus Jakarta Sans';
-
-                // Truncar texto si es muy largo
-                let text = questions[i];
-                if (text.length > 22) {
-                    text = text.substring(0, 20) + '...';
-                }
-
-                ctx.fillText(text, radius - 20, 0);
-                ctx.restore();
-            }
-
-            // Borde exterior estilizado
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.lineWidth = 6;
-            ctx.strokeStyle = '#334155';
-            ctx.stroke();
-        }
-
-        // Ejecutar el giro de la ruleta
-        function spinWheel() {
-            if (isSpinning) return;
-
-            const today = new Date().toDateString();
-            const lastSpinDate = localStorage.getItem('daily_wheel_last_spin');
-
-            if (lastSpinDate === today) {
-                showToast('Ya realizaste tu giro de hoy. ¡Vuelve mañana!', 'warning');
-                return;
-            }
-
-            if (questions.length === 0) {
-                showToast('Por favor, añade al menos una pregunta a la lista.', 'error');
-                return;
-            }
-
-            isSpinning = true;
-            spinBtn.disabled = true;
-            spinIcon.classList.add('fa-spin');
-            resultCard.classList.add('hidden');
-
-            // Selección aleatoria del ganador
-            const numSlices = questions.length;
-            const winnerIndex = Math.floor(Math.random() * numSlices);
-            
-            // Cálculo del ángulo objetivo (Puntero está arriba = -90° ó 270°)
-            const sliceAngleDeg = 360 / numSlices;
-            // Alinea el centro del sector con la parte superior
-            const targetSliceCenter = (winnerIndex * sliceAngleDeg) + (sliceAngleDeg / 2);
-            const targetRotationNeeded = 360 - targetSliceCenter - 90;
-
-            // Múltiples vueltas completas (5 a 8 vueltas) para dar emoción
-            const extraSpins = (5 + Math.floor(Math.random() * 3)) * 360;
-            
-            // Ajustar rotación actual manteniendo el acumulado
-            const currentDegreeMod = currentRotation % 360;
-            const rotationOffset = (targetRotationNeeded - currentDegreeMod + 360) % 360;
-            
-            currentRotation += extraSpins + rotationOffset;
-
-            // Animación CSS por transform
-            canvas.style.transform = `rotate(${currentRotation}deg)`;
-
-            // Finalización de la animación (4 segundos)
-            setTimeout(() => {
-                isSpinning = false;
-                spinIcon.classList.remove('fa-spin');
-
-                const winningQuestion = questions[winnerIndex];
-                
-                // Mostrar resultado
-                questionResult.textContent = winningQuestion;
-                resultCard.classList.remove('hidden');
-
-                // Guardar intento diario
-                localStorage.setItem('daily_wheel_last_spin', today);
-                localStorage.setItem('daily_wheel_today_question', winningQuestion);
-
-                updateSpinButtonState(true, winningQuestion);
-                showToast('¡Tu pregunta del día está lista!', 'success');
-            }, 4000);
-        }
-
-        // Verificar el estado de tirada diaria
-        function checkDailySpin() {
-            const today = new Date().toDateString();
-            const lastSpinDate = localStorage.getItem('daily_wheel_last_spin');
-            const savedTodayQuestion = localStorage.getItem('daily_wheel_today_question');
-
-            if (lastSpinDate === today && savedTodayQuestion) {
-                updateSpinButtonState(true, savedTodayQuestion);
-                questionResult.textContent = savedTodayQuestion;
-                resultCard.classList.remove('hidden');
-            } else {
-                updateSpinButtonState(false);
-            }
-        }
-
-        // Actualiza interfaz según si ya se giró hoy o no
-        function updateSpinButtonState(hasSpunToday, questionText = '') {
-            if (hasSpunToday) {
-                spinBtn.disabled = true;
-                spinBtnText.textContent = 'Giro Realizado Hoy';
-                spinIcon.className = 'fas fa-check-circle text-emerald-400';
-                spinStatusText.textContent = '¡Ya descubriste tu pregunta de hoy! Vuelve mañana.';
-                spinStatusText.className = 'text-xs text-emerald-400 font-semibold mt-2';
-            } else {
-                spinBtn.disabled = false;
-                spinBtnText.textContent = '¡Girar Ruleta!';
-                spinIcon.className = 'fas fa-sync-alt text-xl';
-                spinStatusText.textContent = 'Queda 1 giro disponible para hoy';
-                spinStatusText.className = 'text-xs text-slate-400 mt-2 font-medium';
-            }
-        }
-
-        // Renderizar panel de preguntas
-        function renderQuestionsList() {
-            questionsList.innerHTML = '';
-            questionCount.textContent = `${questions.length} preguntas`;
-
-            questions.forEach((q, index) => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between bg-slate-800/50 border border-slate-700/60 rounded-xl p-2.5 text-xs text-slate-200 group hover:border-slate-600 transition';
-                
-                item.innerHTML = `
-                    <div class="flex items-center gap-2 overflow-hidden mr-2">
-                        <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: ${sliceColors[index % sliceColors.length]}"></span>
-                        <span class="truncate font-medium">${escapeHtml(q)}</span>
-                    </div>
-                    <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                        <button onclick="editQuestion(${index})" title="Editar" class="p-1.5 text-slate-400 hover:text-indigo-400 rounded-lg hover:bg-slate-700 transition">
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button onclick="deleteQuestion(${index})" title="Eliminar" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-700 transition">
-                            <i class="fas fa-trash-can"></i>
-                        </button>
-                    </div>
-                `;
-                questionsList.appendChild(item);
-            });
-        }
-
-        // Agregar una nueva pregunta
-        function addQuestion(e) {
-            e.preventDefault();
-            const input = document.getElementById('newQuestionInput');
-            const text = input.value.trim();
-
-            if (!text) return;
-
-            questions.push(text);
-            saveQuestionsToStorage();
-            renderQuestionsList();
-            drawWheel();
-
-            input.value = '';
-            showToast('Pregunta agregada a la ruleta.', 'success');
-        }
-
-        // Editar una pregunta
-        function editQuestion(index) {
-            const currentText = questions[index];
-            const newText = prompt('Editar pregunta:', currentText);
-            
-            if (newText !== null && newText.trim() !== '') {
-                questions[index] = newText.trim();
-                saveQuestionsToStorage();
-                renderQuestionsList();
-                drawWheel();
-                showToast('Pregunta actualizada.', 'info');
-            }
-        }
-
-        // Eliminar una pregunta
-        function deleteQuestion(index) {
-            if (questions.length <= 1) {
-                showToast('Debes mantener al menos 1 pregunta en la ruleta.', 'warning');
-                return;
-            }
-            questions.splice(index, 1);
-            saveQuestionsToStorage();
-            renderQuestionsList();
-            drawWheel();
-            showToast('Pregunta eliminada.', 'info');
-        }
-
-        // Reiniciar intento diario (Modo Demo)
-        function resetDailySpin() {
-            localStorage.removeItem('daily_wheel_last_spin');
-            localStorage.removeItem('daily_wheel_today_question');
-            resultCard.classList.add('hidden');
-            updateSpinButtonState(false);
-            showToast('Modo Demo: Giro diario restablecido.', 'info');
-        }
-
-        // Restablecer preguntas por defecto
-        function restoreDefaultQuestions() {
-            questions = [...defaultQuestions];
-            saveQuestionsToStorage();
-            renderQuestionsList();
-            drawWheel();
-            showToast('Se restablecieron las 10 preguntas por defecto.', 'info');
-        }
-
-        // Helper para mostrar notificaciones estilo Toast
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMessage.textContent = message;
-
-            if (type === 'success') {
-                toastIcon.className = 'fas fa-check-circle text-emerald-400';
-            } else if (type === 'warning') {
-                toastIcon.className = 'fas fa-exclamation-triangle text-amber-400';
-            } else if (type === 'error') {
-                toastIcon.className = 'fas fa-times-circle text-rose-400';
-            } else {
-                toastIcon.className = 'fas fa-info-circle text-indigo-400';
-            }
-
-            toast.classList.remove('translate-x-full');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-            }, 3000);
-        }
-
-        // Escape de caracteres HTML por seguridad
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-    </script>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="es"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Caro &amp; Ric - Ruleta Diaria&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>:root {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--bg-color: #0f172a;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--card-bg: #1e293b;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--accent: #6366f1;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--accent-hover: #4f46e5;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--success: #10b981;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--success-hover: #059669;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--text-main: #f8fafc;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>--text-muted: #94a3b8;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: var(--bg-color);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: var(--text-main);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex-direction: column;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>align-items: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>min-height: 100vh;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.container {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>max-width: 800px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex-direction: column;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>align-items: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gap: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-align: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>h1 {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-bottom: 5px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: #e2e8f0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.subtitle {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: var(--text-muted);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 0.95rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.wheel-container {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: relative;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 320px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 320px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 20px 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.pointer {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: absolute;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>top: -15px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>left: 50%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transform: translateX(-50%);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-left: 15px solid transparent;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-right: 15px solid transparent;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-top: 25px solid #ef4444;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>z-index: 10;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 50%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transition: transform 4s cubic-bezier(0.15, 0.99, 0.15, 0.99);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>button {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: var(--accent);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: white;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 12px 24px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 1rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: bold;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 8px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>cursor: pointer;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transition: background-color 0.2s, transform 0.1s;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>button:hover {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: var(--accent-hover);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>button:disabled {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: #475569;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>cursor: not-allowed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>opacity: 0.6;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.result-card {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: var(--card-bg);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-left: 4px solid var(--accent);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 20px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 8px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex-direction: column;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>align-items: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gap: 15px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.result-card h2 {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 1.1rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: var(--text-muted);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.result-card p {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 1.3rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: 600;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.copy-btn {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: var(--success);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 8px 16px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 0.9rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.copy-btn:hover {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: var(--success-hover);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Caro &amp; Ric&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;p class="subtitle"&gt;Gira la ruleta&lt;/p&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="wheel-container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="pointer"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;canvas id="wheel" width="320" height="320"&gt;&lt;/canvas&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="spinBtn" onclick="spin()"&gt;¡Girar Ruleta!&lt;/button&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="resultCard" class="result-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Tu pregunta de hoy:&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;p id="questionDisplay"&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="copy-btn" onclick="copyQuestion()"&gt;Copiar pregunta&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Lista fija de preguntas/pensamientos/retos</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const questions = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"¿Qué te hizo sonreír hoy?",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"¿Qué desafío superaste esta semana?",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"¿Qué pequeño detalle aprecias más el día de hoy?",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"¿Por qué estás agradecido hoy?",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"¿Qué puedes hacer mañana para mejorar?",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"¿Cuál ha sido tu mejor recuerdo juntos este mes?",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>"Comparte una meta que te ilusione mucho ahora mismo."</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const colors = ["#4f46e5", "#06b6d4", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#3b82f6"];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>let currentAngle = 0;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const canvas = document.getElementById('wheel');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const ctx = canvas.getContext('2d');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const spinBtn = document.getElementById('spinBtn');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const resultCard = document.getElementById('resultCard');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const questionDisplay = document.getElementById('questionDisplay');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function init() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>drawWheel();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>checkDailySpin();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function drawWheel() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const numOptions = questions.length;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (numOptions === 0) return;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const arcSize = (2 * Math.PI) / numOptions;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const radius = canvas.width / 2;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx.clearRect(0, 0, canvas.width, canvas.height);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>for (let i = 0; i &lt; numOptions; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const angle = i * arcSize;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Dibujar sector</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.beginPath();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillStyle = colors[i % colors.length];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.moveTo(radius, radius);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.arc(radius, radius, radius, angle, angle + arcSize);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.lineTo(radius, radius);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Dibujar texto</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.save();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.translate(radius, radius);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.rotate(angle + arcSize / 2);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.textAlign = "right";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillStyle = "#fff";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.font = "bold 11px sans-serif";</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let text = questions[i];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (text.length &gt; 18) text = text.substring(0, 16) + '...';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillText(text, radius - 15, 4);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.restore();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function spin() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const today = new Date().toDateString();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const lastSpin = localStorage.getItem('last_spin_date');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (lastSpin === today) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>alert("Ya giraste la ruleta el día de hoy. ¡Vuelve mañana!");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>spinBtn.disabled = true;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const numOptions = questions.length;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const selectedIndex = Math.floor(Math.random() * numOptions);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const arcSize = 360 / numOptions;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const targetAngle = 360 - (selectedIndex * arcSize) - (arcSize / 2) - 90;<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const extraRotations = 5 * 360;<span class="Apple-converted-space"> </span></span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>currentAngle += extraRotations + (targetAngle - (currentAngle % 360));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas.style.transform = `rotate(${currentAngle}deg)`;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>setTimeout(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const selectedQuestion = questions[selectedIndex];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>questionDisplay.textContent = selectedQuestion;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>resultCard.style.display = 'flex';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>localStorage.setItem('last_spin_date', today);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>localStorage.setItem('today_question', selectedQuestion);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>spinBtn.innerText = "Giro realizado hoy";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}, 4000);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function checkDailySpin() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const today = new Date().toDateString();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const lastSpin = localStorage.getItem('last_spin_date');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (lastSpin === today) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>spinBtn.disabled = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>spinBtn.innerText = "Giro realizado hoy";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const savedQuestion = localStorage.getItem('today_question');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (savedQuestion) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>questionDisplay.textContent = savedQuestion;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>resultCard.style.display = 'flex';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function copyQuestion() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const textToCopy = questionDisplay.textContent;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>navigator.clipboard.writeText(textToCopy).then(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const copyBtn = document.querySelector('.copy-btn');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>copyBtn.textContent = "¡Copiado!";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>copyBtn.textContent = "Copiar pregunta";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}, 2000);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}).catch(err =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>console.error('Error al copiar: ', err);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>init();</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
 </body>
 </html>
