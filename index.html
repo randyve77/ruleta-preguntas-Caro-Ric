@@ -156,8 +156,8 @@
 </div>
 
 <script>
-    // Lista fija de preguntas/pensamientos/retos
-    const questions = [
+    // Lista completa original de preguntas
+    const allQuestions = [
         "¿Qué te hizo sonreír hoy?",
         "¿Qué desafío superaste esta semana?",
         "¿Qué pequeño detalle aprecias más el día de hoy?",
@@ -169,6 +169,7 @@
 
     const colors = ["#4f46e5", "#06b6d4", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#3b82f6"];
     let currentAngle = 0;
+    let activeQuestions = [];
 
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
@@ -177,12 +178,26 @@
     const questionDisplay = document.getElementById('questionDisplay');
 
     function init() {
+        loadAvailableQuestions();
         drawWheel();
         checkDailySpin();
     }
 
+    function loadAvailableQuestions() {
+        let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
+        
+        // Filtramos las que ya salieron
+        activeQuestions = allQuestions.filter(q => !used.includes(q));
+
+        // Si ya se usaron todas, reiniciamos el ciclo automáticamente
+        if (activeQuestions.length === 0) {
+            localStorage.removeItem('used_questions');
+            activeQuestions = [...allQuestions];
+        }
+    }
+
     function drawWheel() {
-        const numOptions = questions.length;
+        const numOptions = activeQuestions.length;
         if (numOptions === 0) return;
 
         const arcSize = (2 * Math.PI) / numOptions;
@@ -209,7 +224,7 @@
             ctx.fillStyle = "#fff";
             ctx.font = "bold 11px sans-serif";
 
-            let text = questions[i];
+            let text = activeQuestions[i];
             if (text.length > 18) text = text.substring(0, 16) + '...';
 
             ctx.fillText(text, radius - 15, 4);
@@ -228,8 +243,9 @@
 
         spinBtn.disabled = true;
 
-        const numOptions = questions.length;
+        const numOptions = activeQuestions.length;
         const selectedIndex = Math.floor(Math.random() * numOptions);
+        const selectedQuestion = activeQuestions[selectedIndex];
         
         const arcSize = 360 / numOptions;
         const targetAngle = 360 - (selectedIndex * arcSize) - (arcSize / 2) - 90; 
@@ -240,12 +256,17 @@
         canvas.style.transform = `rotate(${currentAngle}deg)`;
 
         setTimeout(() => {
-            const selectedQuestion = questions[selectedIndex];
             questionDisplay.textContent = selectedQuestion;
             resultCard.style.display = 'flex';
 
+            // Guardamos la fecha de hoy
             localStorage.setItem('last_spin_date', today);
             localStorage.setItem('today_question', selectedQuestion);
+            
+            // Guardamos esta pregunta en la lista de usadas para que no vuelva a aparecer
+            let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
+            used.push(selectedQuestion);
+            localStorage.setItem('used_questions', JSON.stringify(used));
             
             spinBtn.innerText = "Giro realizado hoy";
         }, 4000);
