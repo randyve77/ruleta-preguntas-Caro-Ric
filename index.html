@@ -1,302 +1,286 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2775.1">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caro & Ric - Ruleta Diaria</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --success-hover: #059669;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            color: #e2e8f0;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-top: 0;
+            font-size: 0.95rem;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 20px 0;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ef4444;
+            z-index: 10;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.15, 0.99);
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .result-card {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .result-card h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .result-card p {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .copy-btn {
+            background-color: var(--success);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--success-hover);
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="es"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Caro &amp; Ric - Ruleta Diaria&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--bg-color: #0f172a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--card-bg: #1e293b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent: #6366f1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent-hover: #4f46e5;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--success: #10b981;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--success-hover: #059669;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-main: #f8fafc;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-muted: #94a3b8;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--bg-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-main);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 800px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>h1 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #e2e8f0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.subtitle {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.95rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.wheel-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 320px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 320px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pointer {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: -15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateX(-50%);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 15px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-right: 15px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-top: 25px solid #ef4444;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 10;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>canvas {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 4s cubic-bezier(0.15, 0.99, 0.15, 0.99);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.2s, transform 0.1s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--accent-hover);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>button:disabled {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #475569;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: not-allowed;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0.6;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--card-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 4px solid var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-card h2 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.result-card p {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.3rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.copy-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--success);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.9rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.copy-btn:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--success-hover);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Caro &amp; Ric&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p class="subtitle"&gt;Gira la ruleta&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="wheel-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pointer"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="wheel" width="320" height="320"&gt;&lt;/canvas&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="spinBtn" onclick="spin()"&gt;¡Girar Ruleta!&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="resultCard" class="result-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Tu pregunta de hoy:&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p id="questionDisplay"&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="copy-btn" onclick="copyQuestion()"&gt;Copiar pregunta&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Lista fija de preguntas/pensamientos/retos</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const questions = [</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"¿Qué te hizo sonreír hoy?",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"¿Qué desafío superaste esta semana?",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"¿Qué pequeño detalle aprecias más el día de hoy?",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"¿Por qué estás agradecido hoy?",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"¿Qué puedes hacer mañana para mejorar?",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"¿Cuál ha sido tu mejor recuerdo juntos este mes?",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>"Comparte una meta que te ilusione mucho ahora mismo."</p>
-<p class="p1"><span class="Apple-converted-space">    </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const colors = ["#4f46e5", "#06b6d4", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#3b82f6"];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let currentAngle = 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const canvas = document.getElementById('wheel');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const ctx = canvas.getContext('2d');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const spinBtn = document.getElementById('spinBtn');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const resultCard = document.getElementById('resultCard');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const questionDisplay = document.getElementById('questionDisplay');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function init() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>drawWheel();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>checkDailySpin();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function drawWheel() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const numOptions = questions.length;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (numOptions === 0) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const arcSize = (2 * Math.PI) / numOptions;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const radius = canvas.width / 2;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.clearRect(0, 0, canvas.width, canvas.height);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>for (let i = 0; i &lt; numOptions; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const angle = i * arcSize;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Dibujar sector</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillStyle = colors[i % colors.length];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.moveTo(radius, radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.arc(radius, radius, radius, angle, angle + arcSize);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.lineTo(radius, radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fill();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Dibujar texto</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.save();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.translate(radius, radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.rotate(angle + arcSize / 2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.textAlign = "right";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillStyle = "#fff";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.font = "bold 11px sans-serif";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let text = questions[i];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (text.length &gt; 18) text = text.substring(0, 16) + '...';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillText(text, radius - 15, 4);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.restore();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function spin() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const today = new Date().toDateString();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const lastSpin = localStorage.getItem('last_spin_date');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (lastSpin === today) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>alert("Ya giraste la ruleta el día de hoy. ¡Vuelve mañana!");</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>spinBtn.disabled = true;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const numOptions = questions.length;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const selectedIndex = Math.floor(Math.random() * numOptions);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const arcSize = 360 / numOptions;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const targetAngle = 360 - (selectedIndex * arcSize) - (arcSize / 2) - 90;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const extraRotations = 5 * 360;<span class="Apple-converted-space"> </span></p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>currentAngle += extraRotations + (targetAngle - (currentAngle % 360));</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>canvas.style.transform = `rotate(${currentAngle}deg)`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const selectedQuestion = questions[selectedIndex];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>questionDisplay.textContent = selectedQuestion;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>resultCard.style.display = 'flex';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>localStorage.setItem('last_spin_date', today);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>localStorage.setItem('today_question', selectedQuestion);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>spinBtn.innerText = "Giro realizado hoy";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}, 4000);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function checkDailySpin() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const today = new Date().toDateString();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const lastSpin = localStorage.getItem('last_spin_date');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (lastSpin === today) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>spinBtn.disabled = true;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>spinBtn.innerText = "Giro realizado hoy";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const savedQuestion = localStorage.getItem('today_question');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (savedQuestion) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>questionDisplay.textContent = savedQuestion;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultCard.style.display = 'flex';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function copyQuestion() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const textToCopy = questionDisplay.textContent;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>navigator.clipboard.writeText(textToCopy).then(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const copyBtn = document.querySelector('.copy-btn');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>copyBtn.textContent = "¡Copiado!";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>copyBtn.textContent = "Copiar pregunta";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}, 2000);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}).catch(err =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.error('Error al copiar: ', err);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>init();</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div class="container">
+    <h1>Caro & Ric</h1>
+    <p class="subtitle">Gira la ruleta</p>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="320" height="320"></canvas>
+    </div>
+
+    <button id="spinBtn" onclick="spin()">¡Girar Ruleta!</button>
+
+    <div id="resultCard" class="result-card">
+        <h2>Tu pregunta de hoy:</h2>
+        <p id="questionDisplay"></p>
+        <button class="copy-btn" onclick="copyQuestion()">Copiar pregunta</button>
+    </div>
+</div>
+
+<script>
+    // Lista fija de preguntas/pensamientos/retos
+    const questions = [
+        "¿Qué te hizo sonreír hoy?",
+        "¿Qué desafío superaste esta semana?",
+        "¿Qué pequeño detalle aprecias más el día de hoy?",
+        "¿Por qué estás agradecido hoy?",
+        "¿Qué puedes hacer mañana para mejorar?",
+        "¿Cuál ha sido tu mejor recuerdo juntos este mes?",
+        "Comparte una meta que te ilusione mucho ahora mismo."
+    ];
+
+    const colors = ["#4f46e5", "#06b6d4", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#3b82f6"];
+    let currentAngle = 0;
+
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const spinBtn = document.getElementById('spinBtn');
+    const resultCard = document.getElementById('resultCard');
+    const questionDisplay = document.getElementById('questionDisplay');
+
+    function init() {
+        drawWheel();
+        checkDailySpin();
+    }
+
+    function drawWheel() {
+        const numOptions = questions.length;
+        if (numOptions === 0) return;
+
+        const arcSize = (2 * Math.PI) / numOptions;
+        const radius = canvas.width / 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < numOptions; i++) {
+            const angle = i * arcSize;
+            
+            // Dibujar sector
+            ctx.beginPath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.moveTo(radius, radius);
+            ctx.arc(radius, radius, radius, angle, angle + arcSize);
+            ctx.lineTo(radius, radius);
+            ctx.fill();
+
+            // Dibujar texto
+            ctx.save();
+            ctx.translate(radius, radius);
+            ctx.rotate(angle + arcSize / 2);
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 11px sans-serif";
+
+            let text = questions[i];
+            if (text.length > 18) text = text.substring(0, 16) + '...';
+
+            ctx.fillText(text, radius - 15, 4);
+            ctx.restore();
+        }
+    }
+
+    function spin() {
+        const today = new Date().toDateString();
+        const lastSpin = localStorage.getItem('last_spin_date');
+
+        if (lastSpin === today) {
+            alert("Ya giraste la ruleta el día de hoy. ¡Vuelve mañana!");
+            return;
+        }
+
+        spinBtn.disabled = true;
+
+        const numOptions = questions.length;
+        const selectedIndex = Math.floor(Math.random() * numOptions);
+        
+        const arcSize = 360 / numOptions;
+        const targetAngle = 360 - (selectedIndex * arcSize) - (arcSize / 2) - 90; 
+        const extraRotations = 5 * 360; 
+        
+        currentAngle += extraRotations + (targetAngle - (currentAngle % 360));
+
+        canvas.style.transform = `rotate(${currentAngle}deg)`;
+
+        setTimeout(() => {
+            const selectedQuestion = questions[selectedIndex];
+            questionDisplay.textContent = selectedQuestion;
+            resultCard.style.display = 'flex';
+
+            localStorage.setItem('last_spin_date', today);
+            localStorage.setItem('today_question', selectedQuestion);
+            
+            spinBtn.innerText = "Giro realizado hoy";
+        }, 4000);
+    }
+
+    function checkDailySpin() {
+        const today = new Date().toDateString();
+        const lastSpin = localStorage.getItem('last_spin_date');
+
+        if (lastSpin === today) {
+            spinBtn.disabled = true;
+            spinBtn.innerText = "Giro realizado hoy";
+            const savedQuestion = localStorage.getItem('today_question');
+            if (savedQuestion) {
+                questionDisplay.textContent = savedQuestion;
+                resultCard.style.display = 'flex';
+            }
+        }
+    }
+
+    function copyQuestion() {
+        const textToCopy = questionDisplay.textContent;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const copyBtn = document.querySelector('.copy-btn');
+            copyBtn.textContent = "¡Copiado!";
+            setTimeout(() => {
+                copyBtn.textContent = "Copiar pregunta";
+            }, 2000);
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+        });
+    }
+
+    init();
+</script>
+
 </body>
 </html>
