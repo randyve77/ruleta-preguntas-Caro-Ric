@@ -1,568 +1,534 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2775.1">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6d6d6d; -webkit-text-stroke: #6d6d6d}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6b0001; -webkit-text-stroke: #6b0001}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #fb0007; -webkit-text-stroke: #fb0007}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #0000ff; -webkit-text-stroke: #0000ff}
-    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; -webkit-text-stroke: #000000}
-    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #0f7001; -webkit-text-stroke: #0f7001}
-    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #093c94; -webkit-text-stroke: #093c94}
-    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; -webkit-text-stroke: #000000; min-height: 16.0px}
-    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #900112; -webkit-text-stroke: #900112}
-    span.s1 {font-kerning: none; background-color: #fffffe}
-    span.s2 {font-kerning: none; color: #fb0007; background-color: #fffffe; -webkit-text-stroke: 0px #fb0007}
-    span.s3 {font-kerning: none; color: #2a2a2a; background-color: #fffffe; -webkit-text-stroke: 0px #2a2a2a}
-    span.s4 {font-kerning: none; color: #000000; background-color: #fffffe; -webkit-text-stroke: 0px #000000}
-    span.s5 {font-kerning: none; color: #0000ff; background-color: #fffffe; -webkit-text-stroke: 0px #0000ff}
-    span.s6 {font-kerning: none; color: #6b0001; background-color: #fffffe; -webkit-text-stroke: 0px #6b0001}
-    span.s7 {font-kerning: none; color: #900112; background-color: #fffffe; -webkit-text-stroke: 0px #900112}
-    span.s8 {font-kerning: none; color: #137646; background-color: #fffffe; -webkit-text-stroke: 0px #137646}
-    span.s9 {font-kerning: none}
-    span.s10 {font-kerning: none; color: #093c94; background-color: #fffffe; -webkit-text-stroke: 0px #093c94}
-    span.s11 {font-kerning: none; color: #0e6e6d; background-color: #fffffe; -webkit-text-stroke: 0px #0e6e6d}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta de Preguntas Diarias</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+        }
+
+        /* Estilos de la rueda en Canvas */
+        #wheelCanvas {
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.15, 0.99);
+            transform-origin: center center;
+        }
+
+        /* Indicador / Puntero flotante con sombra */
+        .wheel-pointer {
+            filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.4));
+        }
+
+        /* Scrollbar personalizada para la lista */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
 </head>
-<body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE</span><span class="s2"> html</span><span class="s1">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;</span><span class="s1">html</span><span class="s4"> </span><span class="s2">lang</span><span class="s3">=</span><span class="s5">"es"</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;</span><span class="s1">head</span><span class="s3">&gt;</span></p>
-<p class="p3"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">meta</span><span class="s4"> </span><span class="s1">charset</span><span class="s3">=</span><span class="s5">"UTF-8"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">meta</span><span class="s4"> </span><span class="s2">name</span><span class="s3">=</span><span class="s1">"viewport"</span><span class="s4"> </span><span class="s2">content</span><span class="s3">=</span><span class="s1">"width=device-width, initial-scale=1.0"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">title</span><span class="s3">&gt;</span><span class="s1">Ruleta de Preguntas Diarias</span><span class="s3">&lt;/</span><span class="s6">title</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- Tailwind CSS CDN --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">script</span><span class="s4"> </span><span class="s2">src</span><span class="s3">=</span><span class="s1">"https://cdn.tailwindcss.com"</span><span class="s3">&gt;&lt;/</span><span class="s6">script</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- FontAwesome para iconos --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">link</span><span class="s4"> </span><span class="s2">rel</span><span class="s3">=</span><span class="s1">"stylesheet"</span><span class="s4"> </span><span class="s2">href</span><span class="s3">=</span><span class="s1">"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- Google Fonts --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">link</span><span class="s4"> </span><span class="s2">href</span><span class="s3">=</span><span class="s1">"https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap"</span><span class="s4"> </span><span class="s2">rel</span><span class="s3">=</span><span class="s1">"stylesheet"</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">script</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>tailwind.config = {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>theme: {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>extend: {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>fontFamily: {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>sans: [</span><span class="s7">'Plus Jakarta Sans'</span><span class="s1">, </span><span class="s7">'sans-serif'</span><span class="s1">],</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>},</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>colors: {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>brand: {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                            </span></span><span class="s8">50</span><span class="s1">: </span><span class="s7">'#f0fdf4'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                            </span></span><span class="s8">500</span><span class="s1">: </span><span class="s7">'#22c55e'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                            </span></span><span class="s8">600</span><span class="s1">: </span><span class="s7">'#16a34a'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                            </span></span><span class="s8">700</span><span class="s1">: </span><span class="s7">'#15803d'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">script</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">style</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s6">body</span><span class="s1"> {</span></p>
-<p class="p7"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s2">background:</span><span class="s4"> </span><span class="s1">linear-gradient(</span><span class="s8">135deg</span><span class="s4">, </span><span class="s1">#0f172a</span><span class="s4"> </span><span class="s8">0%</span><span class="s4">, </span><span class="s1">#1e1b4b</span><span class="s4"> </span><span class="s8">100%</span><span class="s1">)</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">min-height:</span><span class="s1"> </span><span class="s8">100vh</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">/* Estilos de la rueda en Canvas */</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">#wheelCanvas</span><span class="s4"> {</span></p>
-<p class="p7"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s2">transition:</span><span class="s4"> </span><span class="s1">transform</span><span class="s4"> </span><span class="s8">4s</span><span class="s4"> </span><span class="s1">cubic-bezier(</span><span class="s8">0.15</span><span class="s4">, </span><span class="s8">0.99</span><span class="s4">, </span><span class="s8">0.15</span><span class="s4">, </span><span class="s8">0.99</span><span class="s1">)</span><span class="s4">;</span></p>
-<p class="p3"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">transform-origin:</span><span class="s4"> </span><span class="s10">center</span><span class="s4"> </span><span class="s10">center</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">/* Indicador / Puntero flotante con sombra */</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">.wheel-pointer</span><span class="s4"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">filter:</span><span class="s1"> </span><span class="s10">drop-shadow(</span><span class="s8">0px</span><span class="s1"> </span><span class="s8">4px</span><span class="s1"> </span><span class="s8">6px</span><span class="s1"> </span><span class="s10">rgba(</span><span class="s8">0</span><span class="s1">, </span><span class="s8">0</span><span class="s1">, </span><span class="s8">0</span><span class="s1">, </span><span class="s8">0.4</span><span class="s10">))</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">/* Scrollbar personalizada para la lista */</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">::-webkit-scrollbar</span><span class="s4"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">width:</span><span class="s1"> </span><span class="s8">6px</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">::-webkit-scrollbar-track</span><span class="s4"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">background:</span><span class="s1"> </span><span class="s10">#1e293b</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">border-radius:</span><span class="s1"> </span><span class="s8">4px</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">::-webkit-scrollbar-thumb</span><span class="s4"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">background:</span><span class="s1"> </span><span class="s10">#475569</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">border-radius:</span><span class="s1"> </span><span class="s8">4px</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">::-webkit-scrollbar-thumb:hover</span><span class="s4"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s2">background:</span><span class="s1"> </span><span class="s10">#64748b</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">style</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;/</span><span class="s1">head</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s3">&lt;</span><span class="s6">body</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-slate-100 font-sans p-4 md:p-8 flex flex-col items-center justify-start min-h-screen"</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- Toast Notification (Reemplazo de alert) --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"toast"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 ease-in-out bg-slate-800 text-white border border-slate-700 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"toastIcon"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"fas fa-info-circle text-indigo-400"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"toastMessage"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-sm font-medium"</span><span class="s3">&gt;</span><span class="s4">Notificación</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- Header Principal --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">header</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-center max-w-2xl mb-6"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"fas fa-sparkles"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span><span class="s1"> Tu momento del día</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">h1</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>Ruleta de Preguntas Diarias</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">h1</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-slate-400 text-sm md:text-base mt-2"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>Gira la ruleta cada día para obtener un pensamiento, reto o reflexión personal. ¡Solo 1 intento diario!</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">header</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- Contenedor Principal en Grid --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">main</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">&lt;!-- SECCIÓN DE LA RULETA (Izquierda / Centro) --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">section</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"lg:col-span-7 flex flex-col items-center bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-2xl relative"</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Indicador superior (Puntero) --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"relative flex flex-col items-center z-20 mb-[-20px]"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"wheel-pointer w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[32px] border-t-rose-500"</span><span class="s3">&gt;&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Contenedor del Canvas --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"relative w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[400px] md:h-[400px] flex items-center justify-center my-2"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">canvas</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"wheelCanvas"</span><span class="s4"> </span><span class="s2">width</span><span class="s3">=</span><span class="s1">"400"</span><span class="s4"> </span><span class="s2">height</span><span class="s3">=</span><span class="s1">"400"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full h-full rounded-full shadow-2xl"</span><span class="s3">&gt;&lt;/</span><span class="s6">canvas</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">&lt;!-- Centro de la rueda --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"absolute w-12 h-12 bg-slate-900 border-4 border-slate-700 rounded-full shadow-inner flex items-center justify-center pointer-events-none z-10"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"fas fa-star text-amber-400 text-sm"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Botón de Giro --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-6 w-full max-w-xs text-center"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"spinBtn"</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"spinWheel()"</span><span class="s4"><span class="Apple-converted-space"> </span></span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full py-4 px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none flex items-center justify-center gap-3"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"fas fa-sync-alt text-xl"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"spinIcon"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">span</span><span class="s1"> </span><span class="s2">id</span><span class="s3">=</span><span class="s5">"spinBtnText"</span><span class="s3">&gt;</span><span class="s1">¡Girar Ruleta!</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"spinStatusText"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xs text-slate-400 mt-2 font-medium"</span><span class="s3">&gt;</span><span class="s4">Queda 1 giro disponible para hoy</span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Tarjeta con la Pregunta Seleccionada --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"resultCard"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full mt-6 bg-gradient-to-r from-slate-800 to-slate-800/80 border border-indigo-500/30 rounded-2xl p-5 text-center hidden transform transition-all duration-500"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1 flex items-center justify-center gap-2"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"fas fa-calendar-check"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span><span class="s1"> Tu Pregunta de Hoy:</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">h3</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"questionResult"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xl md:text-2xl font-bold text-slate-100 leading-snug"</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s1">&lt;!-- Texto de la pregunta --&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">h3</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">section</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">&lt;!-- SECCIÓN DE ADMINISTRACIÓN Y GESTIÓN (Derecha) --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">section</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"lg:col-span-5 bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-md shadow-2xl flex flex-col h-full"</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex items-center justify-between mb-4 border-b border-slate-800 pb-3"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">h2</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-lg font-bold text-slate-200 flex items-center gap-2"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"fas fa-[#818cf8] fa-list-check text-indigo-400"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span><span class="s4"> Banco de Preguntas</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">h2</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"questionCount"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-1 rounded-full border border-slate-700"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>0 preguntas</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Formularios de adición --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">form</span><span class="s4"> </span><span class="s2">onsubmit</span><span class="s3">=</span><span class="s1">"addQuestion(event)"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mb-4 flex gap-2"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"text"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"newQuestionInput"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"Escribe una nueva pregunta..."</span><span class="s4"><span class="Apple-converted-space"> </span></span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s1"> </span><span class="s2">type</span><span class="s3">=</span><span class="s5">"submit"</span><span class="s1"><span class="Apple-converted-space"> </span></span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1 shadow-md"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"fas fa-plus"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">form</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Lista con scroll para gestionar preguntas --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 max-h-[320px] overflow-y-auto pr-1 space-y-2"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"questionsList"</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">&lt;!-- Se llena mediante JS --&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Acciones de Control / Modo Demo --&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-6 pt-4 border-t border-slate-800/80 flex flex-col gap-2"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s1"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s5">"resetDailySpin()"</span><span class="s1"><span class="Apple-converted-space"> </span></span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700/80 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"fas fa-[#f59e0b] fa-rotate-left"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span><span class="s1"> Reiniciar prueba diaria (Modo Demo)</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"restoreDefaultQuestions()"</span><span class="s4"><span class="Apple-converted-space"> </span></span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full py-2 px-4 bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-slate-300 rounded-xl text-xs transition flex items-center justify-center gap-2"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">i</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"fas fa-trash-arrow-up"</span><span class="s3">&gt;&lt;/</span><span class="s6">i</span><span class="s3">&gt;</span><span class="s1"> Restablecer 10 preguntas iniciales</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">section</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s6">main</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">footer</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-8 text-center text-xs text-slate-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>Ruleta de Preguntas Diarias &amp;bull; Tus datos se guardan de forma local en tu navegador.</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">footer</span><span class="s3">&gt;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- LOGICA JAVASCRIPT --&gt;</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">script</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Lista por defecto de 10 preguntas motivacionales y reflexivas</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> defaultQuestions = [</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué fue lo mejor que te pasó hoy?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué meta u objetivo quieres cumplir esta semana?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué gran aprendizaje te llevas del día de hoy?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué o quién te hizo sonreír hoy?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿A quién puedes agradecerle algo especial hoy?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué hábito positivo quieres mejorar mañana?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué obstáculo o desafío lograste superar recientemente?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Qué actividad te hizo sentir lleno de energía hoy?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Cuál es tu mayor prioridad para el día de mañana?"</span><span class="s4">,</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"¿Cómo te demostraste amor propio el día de hoy?"</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>];</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Paleta de colores atractiva para los sectores de la ruleta</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> sliceColors = [</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"#6366f1"</span><span class="s4">, </span><span class="s1">"#ec4899"</span><span class="s4">, </span><span class="s1">"#8b5cf6"</span><span class="s4">, </span><span class="s1">"#10b981"</span><span class="s4">,<span class="Apple-converted-space"> </span></span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"#f59e0b"</span><span class="s4">, </span><span class="s1">"#06b6d4"</span><span class="s4">, </span><span class="s1">"#f43f5e"</span><span class="s4">, </span><span class="s1">"#3b82f6"</span><span class="s4">,<span class="Apple-converted-space"> </span></span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">"#84cc16"</span><span class="s4">, </span><span class="s1">"#d946ef"</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>];</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Estado global</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> questions = [];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> currentRotation = </span><span class="s8">0</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> isSpinning = </span><span class="s5">false</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Elementos DOM</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> canvas = document.getElementById(</span><span class="s7">'wheelCanvas'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> ctx = canvas.getContext(</span><span class="s7">'2d'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> spinBtn = document.getElementById(</span><span class="s7">'spinBtn'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> spinBtnText = document.getElementById(</span><span class="s7">'spinBtnText'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> spinIcon = document.getElementById(</span><span class="s7">'spinIcon'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> spinStatusText = document.getElementById(</span><span class="s7">'spinStatusText'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> resultCard = document.getElementById(</span><span class="s7">'resultCard'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> questionResult = document.getElementById(</span><span class="s7">'questionResult'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> questionsList = document.getElementById(</span><span class="s7">'questionsList'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s1"> questionCount = document.getElementById(</span><span class="s7">'questionCount'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Inicialización</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>window.onload = </span><span class="s5">function</span><span class="s1">() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>loadQuestions();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>drawWheel();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>checkDailySpin();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Cargar preguntas desde localStorage o cargar las predeterminadas</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> loadQuestions() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> saved = localStorage.getItem(</span><span class="s7">'daily_wheel_questions'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (saved) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">try</span><span class="s1"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>questions = </span><span class="s11">JSON</span><span class="s1">.parse(saved);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>} </span><span class="s5">catch</span><span class="s1"> (e) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>questions = [...defaultQuestions];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>questions = [...defaultQuestions];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>saveQuestionsToStorage();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>renderQuestionsList();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Guardar preguntas en localStorage</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> saveQuestionsToStorage() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>localStorage.setItem(</span><span class="s7">'daily_wheel_questions'</span><span class="s1">, </span><span class="s11">JSON</span><span class="s1">.stringify(questions));</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Dibujar la ruleta en Canvas HTML5</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> drawWheel() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> numSlices = questions.length;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> width = canvas.width;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> height = canvas.height;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> centerX = width / </span><span class="s8">2</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> centerY = height / </span><span class="s8">2</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> radius = width / </span><span class="s8">2</span><span class="s1"> - </span><span class="s8">10</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>ctx.clearRect(</span><span class="s8">0</span><span class="s1">, </span><span class="s8">0</span><span class="s1">, width, height);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (numSlices === </span><span class="s8">0</span><span class="s1">) {</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Dibujar ruleta vacía</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.beginPath();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.arc(centerX, centerY, radius, </span><span class="s8">0</span><span class="s1">, </span><span class="s8">2</span><span class="s1"> * </span><span class="s11">Math</span><span class="s1">.</span><span class="s11">PI</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = </span><span class="s7">'#334155'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fill();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.strokeStyle = </span><span class="s7">'#475569'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.lineWidth = </span><span class="s8">4</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.stroke();</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = </span><span class="s7">'#94a3b8'</span><span class="s1">;</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>ctx.font = </span><span class="s1">'bold 16px Plus Jakarta Sans'</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.textAlign = </span><span class="s7">'center'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.textBaseline = </span><span class="s7">'middle'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillText(</span><span class="s7">'Agrega al menos 1 pregunta'</span><span class="s1">, centerX, centerY);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">return</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> sliceAngle = (</span><span class="s8">2</span><span class="s1"> * </span><span class="s11">Math</span><span class="s1">.</span><span class="s11">PI</span><span class="s1">) / numSlices;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">for</span><span class="s1"> (</span><span class="s5">let</span><span class="s1"> i = </span><span class="s8">0</span><span class="s1">; i &lt; numSlices; i++) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> angle = i * sliceAngle;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Sector circular</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.beginPath();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.moveTo(centerX, centerY);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.closePath();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = sliceColors[i % sliceColors.length];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fill();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.lineWidth = </span><span class="s8">2</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.strokeStyle = </span><span class="s7">'#0f172a'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.stroke();</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Renderizar Texto en el sector</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.save();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.translate(centerX, centerY);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.rotate(angle + sliceAngle / </span><span class="s8">2</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.textAlign = </span><span class="s7">'right'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.textBaseline = </span><span class="s7">'middle'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = </span><span class="s7">'#ffffff'</span><span class="s1">;</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>ctx.font = </span><span class="s1">'bold 12px Plus Jakarta Sans'</span><span class="s4">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Truncar texto si es muy largo</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> text = questions[i];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (text.length &gt; </span><span class="s8">22</span><span class="s1">) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>text = text.substring(</span><span class="s8">0</span><span class="s1">, </span><span class="s8">20</span><span class="s1">) + </span><span class="s7">'...'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillText(text, radius - </span><span class="s8">20</span><span class="s1">, </span><span class="s8">0</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>ctx.restore();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Borde exterior estilizado</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>ctx.beginPath();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>ctx.arc(centerX, centerY, radius, </span><span class="s8">0</span><span class="s1">, </span><span class="s8">2</span><span class="s1"> * </span><span class="s11">Math</span><span class="s1">.</span><span class="s11">PI</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>ctx.lineWidth = </span><span class="s8">6</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>ctx.strokeStyle = </span><span class="s7">'#334155'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>ctx.stroke();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Ejecutar el giro de la ruleta</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> spinWheel() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (isSpinning) </span><span class="s5">return</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> today = </span><span class="s5">new</span><span class="s1"> </span><span class="s11">Date</span><span class="s1">().toDateString();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> lastSpinDate = localStorage.getItem(</span><span class="s7">'daily_wheel_last_spin'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (lastSpinDate === today) {</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>showToast(</span><span class="s1">'Ya realizaste tu giro de hoy. ¡Vuelve mañana!'</span><span class="s4">, </span><span class="s1">'warning'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">return</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (questions.length === </span><span class="s8">0</span><span class="s1">) {</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>showToast(</span><span class="s1">'Por favor, añade al menos una pregunta a la lista.'</span><span class="s4">, </span><span class="s1">'error'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">return</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>isSpinning = </span><span class="s5">true</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>spinBtn.disabled = </span><span class="s5">true</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>spinIcon.classList.add(</span><span class="s7">'fa-spin'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>resultCard.classList.add(</span><span class="s7">'hidden'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Selección aleatoria del ganador</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> numSlices = questions.length;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> winnerIndex = </span><span class="s11">Math</span><span class="s1">.floor(</span><span class="s11">Math</span><span class="s1">.random() * numSlices);</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Cálculo del ángulo objetivo (Puntero está arriba = -90° ó 270°)</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> sliceAngleDeg = </span><span class="s8">360</span><span class="s1"> / numSlices;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Alinea el centro del sector con la parte superior</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> targetSliceCenter = (winnerIndex * sliceAngleDeg) + (sliceAngleDeg / </span><span class="s8">2</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> targetRotationNeeded = </span><span class="s8">360</span><span class="s1"> - targetSliceCenter - </span><span class="s8">90</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Múltiples vueltas completas (5 a 8 vueltas) para dar emoción</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> extraSpins = (</span><span class="s8">5</span><span class="s1"> + </span><span class="s11">Math</span><span class="s1">.floor(</span><span class="s11">Math</span><span class="s1">.random() * </span><span class="s8">3</span><span class="s1">)) * </span><span class="s8">360</span><span class="s1">;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Ajustar rotación actual manteniendo el acumulado</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> currentDegreeMod = currentRotation % </span><span class="s8">360</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> rotationOffset = (targetRotationNeeded - currentDegreeMod + </span><span class="s8">360</span><span class="s1">) % </span><span class="s8">360</span><span class="s1">;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>currentRotation += extraSpins + rotationOffset;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Animación CSS por transform</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>canvas.style.transform = </span><span class="s7">`rotate(</span><span class="s1">${currentRotation}</span><span class="s7">deg)`</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Finalización de la animación (4 segundos)</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>isSpinning = </span><span class="s5">false</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinIcon.classList.remove(</span><span class="s7">'fa-spin'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> winningQuestion = questions[winnerIndex];</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Mostrar resultado</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>questionResult.textContent = winningQuestion;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>resultCard.classList.remove(</span><span class="s7">'hidden'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Guardar intento diario</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>localStorage.setItem(</span><span class="s7">'daily_wheel_last_spin'</span><span class="s1">, today);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>localStorage.setItem(</span><span class="s7">'daily_wheel_today_question'</span><span class="s1">, winningQuestion);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>updateSpinButtonState(</span><span class="s5">true</span><span class="s1">, winningQuestion);</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>showToast(</span><span class="s1">'¡Tu pregunta del día está lista!'</span><span class="s4">, </span><span class="s1">'success'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}, </span><span class="s8">4000</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Verificar el estado de tirada diaria</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> checkDailySpin() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> today = </span><span class="s5">new</span><span class="s1"> </span><span class="s11">Date</span><span class="s1">().toDateString();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> lastSpinDate = localStorage.getItem(</span><span class="s7">'daily_wheel_last_spin'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> savedTodayQuestion = localStorage.getItem(</span><span class="s7">'daily_wheel_today_question'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (lastSpinDate === today &amp;&amp; savedTodayQuestion) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>updateSpinButtonState(</span><span class="s5">true</span><span class="s1">, savedTodayQuestion);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>questionResult.textContent = savedTodayQuestion;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>resultCard.classList.remove(</span><span class="s7">'hidden'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>updateSpinButtonState(</span><span class="s5">false</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Actualiza interfaz según si ya se giró hoy o no</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> updateSpinButtonState(hasSpunToday, questionText = </span><span class="s7">''</span><span class="s1">) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (hasSpunToday) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinBtn.disabled = </span><span class="s5">true</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinBtnText.textContent = </span><span class="s7">'Giro Realizado Hoy'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinIcon.className = </span><span class="s7">'fas fa-check-circle text-emerald-400'</span><span class="s1">;</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>spinStatusText.textContent = </span><span class="s1">'¡Ya descubriste tu pregunta de hoy! Vuelve mañana.'</span><span class="s4">;</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>spinStatusText.className = </span><span class="s1">'text-xs text-emerald-400 font-semibold mt-2'</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinBtn.disabled = </span><span class="s5">false</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinBtnText.textContent = </span><span class="s7">'¡Girar Ruleta!'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinIcon.className = </span><span class="s7">'fas fa-sync-alt text-xl'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinStatusText.textContent = </span><span class="s7">'Queda 1 giro disponible para hoy'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>spinStatusText.className = </span><span class="s7">'text-xs text-slate-400 mt-2 font-medium'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Renderizar panel de preguntas</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> renderQuestionsList() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>questionsList.innerHTML = </span><span class="s7">''</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>questionCount.textContent = </span><span class="s7">`</span><span class="s1">${questions.length}</span><span class="s7"> preguntas`</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>questions.forEach((q, index) =&gt; {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> item = document.createElement(</span><span class="s7">'div'</span><span class="s1">);</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>item.className = </span><span class="s1">'flex items-center justify-between bg-slate-800/50 border border-slate-700/60 rounded-xl p-2.5 text-xs text-slate-200 group hover:border-slate-600 transition'</span><span class="s4">;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>item.innerHTML = </span><span class="s7">`</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center gap-2 overflow-hidden mr-2"&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: </span><span class="s4">${sliceColors[index % sliceColors.length]}</span><span class="s1">"&gt;&lt;/span&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;span class="truncate font-medium"&gt;</span><span class="s4">${escapeHtml(q)}</span><span class="s1">&lt;/span&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center gap-1 opacity-80 group-hover:opacity-100"&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;button onclick="editQuestion(</span><span class="s4">${index}</span><span class="s1">)" title="Editar" class="p-1.5 text-slate-400 hover:text-indigo-400 rounded-lg hover:bg-slate-700 transition"&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-pen"&gt;&lt;/i&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;button onclick="deleteQuestion(</span><span class="s4">${index}</span><span class="s1">)" title="Eliminar" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-700 transition"&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-trash-can"&gt;&lt;/i&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
-<p class="p9"><span class="s1"><span class="Apple-converted-space">                </span>`</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>questionsList.appendChild(item);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Agregar una nueva pregunta</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> addQuestion(e) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>e.preventDefault();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> input = document.getElementById(</span><span class="s7">'newQuestionInput'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> text = input.value.trim();</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (!text) </span><span class="s5">return</span><span class="s1">;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>questions.push(text);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>saveQuestionsToStorage();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>renderQuestionsList();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>drawWheel();</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>input.value = </span><span class="s7">''</span><span class="s1">;</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span>showToast(</span><span class="s1">'Pregunta agregada a la ruleta.'</span><span class="s4">, </span><span class="s1">'success'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Editar una pregunta</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> editQuestion(index) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> currentText = questions[index];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> newText = prompt(</span><span class="s7">'Editar pregunta:'</span><span class="s1">, currentText);</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (newText !== </span><span class="s5">null</span><span class="s1"> &amp;&amp; newText.trim() !== </span><span class="s7">''</span><span class="s1">) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>questions[index] = newText.trim();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>saveQuestionsToStorage();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>renderQuestionsList();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>drawWheel();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>showToast(</span><span class="s7">'Pregunta actualizada.'</span><span class="s1">, </span><span class="s7">'info'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Eliminar una pregunta</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> deleteQuestion(index) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (questions.length &lt;= </span><span class="s8">1</span><span class="s1">) {</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>showToast(</span><span class="s1">'Debes mantener al menos 1 pregunta en la ruleta.'</span><span class="s4">, </span><span class="s1">'warning'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">return</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>questions.splice(index, </span><span class="s8">1</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>saveQuestionsToStorage();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>renderQuestionsList();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>drawWheel();</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span>showToast(</span><span class="s1">'Pregunta eliminada.'</span><span class="s4">, </span><span class="s1">'info'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Reiniciar intento diario (Modo Demo)</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> resetDailySpin() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>localStorage.removeItem(</span><span class="s7">'daily_wheel_last_spin'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>localStorage.removeItem(</span><span class="s7">'daily_wheel_today_question'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>resultCard.classList.add(</span><span class="s7">'hidden'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>updateSpinButtonState(</span><span class="s5">false</span><span class="s1">);</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span>showToast(</span><span class="s1">'Modo Demo: Giro diario restablecido.'</span><span class="s4">, </span><span class="s1">'info'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Restablecer preguntas por defecto</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> restoreDefaultQuestions() {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>questions = [...defaultQuestions];</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>saveQuestionsToStorage();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>renderQuestionsList();</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>drawWheel();</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">            </span>showToast(</span><span class="s1">'Se restablecieron las 10 preguntas por defecto.'</span><span class="s4">, </span><span class="s1">'info'</span><span class="s4">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Helper para mostrar notificaciones estilo Toast</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> showToast(message, type = </span><span class="s7">'info'</span><span class="s1">) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> toast = document.getElementById(</span><span class="s7">'toast'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> toastMessage = document.getElementById(</span><span class="s7">'toastMessage'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> toastIcon = document.getElementById(</span><span class="s7">'toastIcon'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>toastMessage.textContent = message;</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (type === </span><span class="s7">'success'</span><span class="s1">) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>toastIcon.className = </span><span class="s7">'fas fa-check-circle text-emerald-400'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> </span><span class="s5">if</span><span class="s1"> (type === </span><span class="s7">'warning'</span><span class="s1">) {</span></p>
-<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>toastIcon.className = </span><span class="s1">'fas fa-exclamation-triangle text-amber-400'</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> </span><span class="s5">if</span><span class="s1"> (type === </span><span class="s7">'error'</span><span class="s1">) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>toastIcon.className = </span><span class="s7">'fas fa-times-circle text-rose-400'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>toastIcon.className = </span><span class="s7">'fas fa-info-circle text-indigo-400'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>toast.classList.remove(</span><span class="s7">'translate-x-full'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>toast.classList.add(</span><span class="s7">'translate-x-full'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}, </span><span class="s8">3000</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p8"><span class="s9"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Escape de caracteres HTML por seguridad</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> escapeHtml(text) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> div = document.createElement(</span><span class="s7">'div'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>div.textContent = text;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">return</span><span class="s1"> div.innerHTML;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">script</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;/</span><span class="s1">body</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;/</span><span class="s1">html</span><span class="s3">&gt;</span></p>
+<body class="text-slate-100 font-sans p-4 md:p-8 flex flex-col items-center justify-start min-h-screen">
+
+    <!-- Toast Notification (Reemplazo de alert) -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 ease-in-out bg-slate-800 text-white border border-slate-700 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i id="toastIcon" class="fas fa-info-circle text-indigo-400"></i>
+        <span id="toastMessage" class="text-sm font-medium">Notificación</span>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="text-center max-w-2xl mb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3">
+            <i class="fas fa-sparkles"></i> Tu momento del día
+        </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+            Ruleta de Preguntas Diarias
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base mt-2">
+            Gira la ruleta cada día para obtener un pensamiento, reto o reflexión personal. ¡Solo 1 intento diario!
+        </p>
+    </header>
+
+    <!-- Contenedor Principal en Grid -->
+    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- SECCIÓN DE LA RULETA (Izquierda / Centro) -->
+        <section class="lg:col-span-7 flex flex-col items-center bg-slate-900/60 border border-slate-800 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-2xl relative">
+            
+            <!-- Indicador superior (Puntero) -->
+            <div class="relative flex flex-col items-center z-20 mb-[-20px]">
+                <div class="wheel-pointer w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[32px] border-t-rose-500"></div>
+            </div>
+
+            <!-- Contenedor del Canvas -->
+            <div class="relative w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[400px] md:h-[400px] flex items-center justify-center my-2">
+                <canvas id="wheelCanvas" width="400" height="400" class="w-full h-full rounded-full shadow-2xl"></canvas>
+                <!-- Centro de la rueda -->
+                <div class="absolute w-12 h-12 bg-slate-900 border-4 border-slate-700 rounded-full shadow-inner flex items-center justify-center pointer-events-none z-10">
+                    <i class="fas fa-star text-amber-400 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Botón de Giro -->
+            <div class="mt-6 w-full max-w-xs text-center">
+                <button id="spinBtn" onclick="spinWheel()" 
+                    class="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none flex items-center justify-center gap-3">
+                    <i class="fas fa-sync-alt text-xl" id="spinIcon"></i>
+                    <span id="spinBtnText">¡Girar Ruleta!</span>
+                </button>
+                <p id="spinStatusText" class="text-xs text-slate-400 mt-2 font-medium">Queda 1 giro disponible para hoy</p>
+            </div>
+
+            <!-- Tarjeta con la Pregunta Seleccionada -->
+            <div id="resultCard" class="w-full mt-6 bg-gradient-to-r from-slate-800 to-slate-800/80 border border-indigo-500/30 rounded-2xl p-5 text-center hidden transform transition-all duration-500">
+                <div class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1 flex items-center justify-center gap-2">
+                    <i class="fas fa-calendar-check"></i> Tu Pregunta de Hoy:
+                </div>
+                <h3 id="questionResult" class="text-xl md:text-2xl font-bold text-slate-100 leading-snug">
+                    <!-- Texto de la pregunta -->
+                </h3>
+            </div>
+
+        </section>
+
+        <!-- SECCIÓN DE ADMINISTRACIÓN Y GESTIÓN (Derecha) -->
+        <section class="lg:col-span-5 bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-md shadow-2xl flex flex-col h-full">
+            
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fas fa-[#818cf8] fa-list-check text-indigo-400"></i> Banco de Preguntas
+                </h2>
+                <span id="questionCount" class="text-xs bg-slate-800 text-slate-300 font-semibold px-2.5 py-1 rounded-full border border-slate-700">
+                    0 preguntas
+                </span>
+            </div>
+
+            <!-- Formularios de adición -->
+            <form onsubmit="addQuestion(event)" class="mb-4 flex gap-2">
+                <input type="text" id="newQuestionInput" placeholder="Escribe una nueva pregunta..." 
+                    class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                <button type="submit" 
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1 shadow-md">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+
+            <!-- Lista con scroll para gestionar preguntas -->
+            <div class="flex-1 max-h-[320px] overflow-y-auto pr-1 space-y-2" id="questionsList">
+                <!-- Se llena mediante JS -->
+            </div>
+
+            <!-- Acciones de Control / Modo Demo -->
+            <div class="mt-6 pt-4 border-t border-slate-800/80 flex flex-col gap-2">
+                <button onclick="resetDailySpin()" 
+                    class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700/80 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-[#f59e0b] fa-rotate-left"></i> Reiniciar prueba diaria (Modo Demo)
+                </button>
+                <button onclick="restoreDefaultQuestions()" 
+                    class="w-full py-2 px-4 bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-slate-300 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                    <i class="fas fa-trash-arrow-up"></i> Restablecer 10 preguntas iniciales
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="mt-8 text-center text-xs text-slate-500">
+        Ruleta de Preguntas Diarias &bull; Tus datos se guardan de forma local en tu navegador.
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT -->
+    <script>
+        // Lista por defecto de 10 preguntas motivacionales y reflexivas
+        const defaultQuestions = [
+            "¿Qué fue lo mejor que te pasó hoy?",
+            "¿Qué meta u objetivo quieres cumplir esta semana?",
+            "¿Qué gran aprendizaje te llevas del día de hoy?",
+            "¿Qué o quién te hizo sonreír hoy?",
+            "¿A quién puedes agradecerle algo especial hoy?",
+            "¿Qué hábito positivo quieres mejorar mañana?",
+            "¿Qué obstáculo o desafío lograste superar recientemente?",
+            "¿Qué actividad te hizo sentir lleno de energía hoy?",
+            "¿Cuál es tu mayor prioridad para el día de mañana?",
+            "¿Cómo te demostraste amor propio el día de hoy?"
+        ];
+
+        // Paleta de colores atractiva para los sectores de la ruleta
+        const sliceColors = [
+            "#6366f1", "#ec4899", "#8b5cf6", "#10b981", 
+            "#f59e0b", "#06b6d4", "#f43f5e", "#3b82f6", 
+            "#84cc16", "#d946ef"
+        ];
+
+        // Estado global
+        let questions = [];
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        // Elementos DOM
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const spinBtnText = document.getElementById('spinBtnText');
+        const spinIcon = document.getElementById('spinIcon');
+        const spinStatusText = document.getElementById('spinStatusText');
+        const resultCard = document.getElementById('resultCard');
+        const questionResult = document.getElementById('questionResult');
+        const questionsList = document.getElementById('questionsList');
+        const questionCount = document.getElementById('questionCount');
+
+        // Inicialización
+        window.onload = function() {
+            loadQuestions();
+            drawWheel();
+            checkDailySpin();
+        };
+
+        // Cargar preguntas desde localStorage o cargar las predeterminadas
+        function loadQuestions() {
+            const saved = localStorage.getItem('daily_wheel_questions');
+            if (saved) {
+                try {
+                    questions = JSON.parse(saved);
+                } catch (e) {
+                    questions = [...defaultQuestions];
+                }
+            } else {
+                questions = [...defaultQuestions];
+                saveQuestionsToStorage();
+            }
+            renderQuestionsList();
+        }
+
+        // Guardar preguntas en localStorage
+        function saveQuestionsToStorage() {
+            localStorage.setItem('daily_wheel_questions', JSON.stringify(questions));
+        }
+
+        // Dibujar la ruleta en Canvas HTML5
+        function drawWheel() {
+            const numSlices = questions.length;
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = width / 2 - 10;
+
+            ctx.clearRect(0, 0, width, height);
+
+            if (numSlices === 0) {
+                // Dibujar ruleta vacía
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#334155';
+                ctx.fill();
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 16px Plus Jakarta Sans';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Agrega al menos 1 pregunta', centerX, centerY);
+                return;
+            }
+
+            const sliceAngle = (2 * Math.PI) / numSlices;
+
+            for (let i = 0; i < numSlices; i++) {
+                const angle = i * sliceAngle;
+                
+                // Sector circular
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = sliceColors[i % sliceColors.length];
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#0f172a';
+                ctx.stroke();
+
+                // Renderizar Texto en el sector
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + sliceAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px Plus Jakarta Sans';
+
+                // Truncar texto si es muy largo
+                let text = questions[i];
+                if (text.length > 22) {
+                    text = text.substring(0, 20) + '...';
+                }
+
+                ctx.fillText(text, radius - 20, 0);
+                ctx.restore();
+            }
+
+            // Borde exterior estilizado
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#334155';
+            ctx.stroke();
+        }
+
+        // Ejecutar el giro de la ruleta
+        function spinWheel() {
+            if (isSpinning) return;
+
+            const today = new Date().toDateString();
+            const lastSpinDate = localStorage.getItem('daily_wheel_last_spin');
+
+            if (lastSpinDate === today) {
+                showToast('Ya realizaste tu giro de hoy. ¡Vuelve mañana!', 'warning');
+                return;
+            }
+
+            if (questions.length === 0) {
+                showToast('Por favor, añade al menos una pregunta a la lista.', 'error');
+                return;
+            }
+
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinIcon.classList.add('fa-spin');
+            resultCard.classList.add('hidden');
+
+            // Selección aleatoria del ganador
+            const numSlices = questions.length;
+            const winnerIndex = Math.floor(Math.random() * numSlices);
+            
+            // Cálculo del ángulo objetivo (Puntero está arriba = -90° ó 270°)
+            const sliceAngleDeg = 360 / numSlices;
+            // Alinea el centro del sector con la parte superior
+            const targetSliceCenter = (winnerIndex * sliceAngleDeg) + (sliceAngleDeg / 2);
+            const targetRotationNeeded = 360 - targetSliceCenter - 90;
+
+            // Múltiples vueltas completas (5 a 8 vueltas) para dar emoción
+            const extraSpins = (5 + Math.floor(Math.random() * 3)) * 360;
+            
+            // Ajustar rotación actual manteniendo el acumulado
+            const currentDegreeMod = currentRotation % 360;
+            const rotationOffset = (targetRotationNeeded - currentDegreeMod + 360) % 360;
+            
+            currentRotation += extraSpins + rotationOffset;
+
+            // Animación CSS por transform
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            // Finalización de la animación (4 segundos)
+            setTimeout(() => {
+                isSpinning = false;
+                spinIcon.classList.remove('fa-spin');
+
+                const winningQuestion = questions[winnerIndex];
+                
+                // Mostrar resultado
+                questionResult.textContent = winningQuestion;
+                resultCard.classList.remove('hidden');
+
+                // Guardar intento diario
+                localStorage.setItem('daily_wheel_last_spin', today);
+                localStorage.setItem('daily_wheel_today_question', winningQuestion);
+
+                updateSpinButtonState(true, winningQuestion);
+                showToast('¡Tu pregunta del día está lista!', 'success');
+            }, 4000);
+        }
+
+        // Verificar el estado de tirada diaria
+        function checkDailySpin() {
+            const today = new Date().toDateString();
+            const lastSpinDate = localStorage.getItem('daily_wheel_last_spin');
+            const savedTodayQuestion = localStorage.getItem('daily_wheel_today_question');
+
+            if (lastSpinDate === today && savedTodayQuestion) {
+                updateSpinButtonState(true, savedTodayQuestion);
+                questionResult.textContent = savedTodayQuestion;
+                resultCard.classList.remove('hidden');
+            } else {
+                updateSpinButtonState(false);
+            }
+        }
+
+        // Actualiza interfaz según si ya se giró hoy o no
+        function updateSpinButtonState(hasSpunToday, questionText = '') {
+            if (hasSpunToday) {
+                spinBtn.disabled = true;
+                spinBtnText.textContent = 'Giro Realizado Hoy';
+                spinIcon.className = 'fas fa-check-circle text-emerald-400';
+                spinStatusText.textContent = '¡Ya descubriste tu pregunta de hoy! Vuelve mañana.';
+                spinStatusText.className = 'text-xs text-emerald-400 font-semibold mt-2';
+            } else {
+                spinBtn.disabled = false;
+                spinBtnText.textContent = '¡Girar Ruleta!';
+                spinIcon.className = 'fas fa-sync-alt text-xl';
+                spinStatusText.textContent = 'Queda 1 giro disponible para hoy';
+                spinStatusText.className = 'text-xs text-slate-400 mt-2 font-medium';
+            }
+        }
+
+        // Renderizar panel de preguntas
+        function renderQuestionsList() {
+            questionsList.innerHTML = '';
+            questionCount.textContent = `${questions.length} preguntas`;
+
+            questions.forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-slate-800/50 border border-slate-700/60 rounded-xl p-2.5 text-xs text-slate-200 group hover:border-slate-600 transition';
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden mr-2">
+                        <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: ${sliceColors[index % sliceColors.length]}"></span>
+                        <span class="truncate font-medium">${escapeHtml(q)}</span>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                        <button onclick="editQuestion(${index})" title="Editar" class="p-1.5 text-slate-400 hover:text-indigo-400 rounded-lg hover:bg-slate-700 transition">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button onclick="deleteQuestion(${index})" title="Eliminar" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-700 transition">
+                            <i class="fas fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                questionsList.appendChild(item);
+            });
+        }
+
+        // Agregar una nueva pregunta
+        function addQuestion(e) {
+            e.preventDefault();
+            const input = document.getElementById('newQuestionInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            questions.push(text);
+            saveQuestionsToStorage();
+            renderQuestionsList();
+            drawWheel();
+
+            input.value = '';
+            showToast('Pregunta agregada a la ruleta.', 'success');
+        }
+
+        // Editar una pregunta
+        function editQuestion(index) {
+            const currentText = questions[index];
+            const newText = prompt('Editar pregunta:', currentText);
+            
+            if (newText !== null && newText.trim() !== '') {
+                questions[index] = newText.trim();
+                saveQuestionsToStorage();
+                renderQuestionsList();
+                drawWheel();
+                showToast('Pregunta actualizada.', 'info');
+            }
+        }
+
+        // Eliminar una pregunta
+        function deleteQuestion(index) {
+            if (questions.length <= 1) {
+                showToast('Debes mantener al menos 1 pregunta en la ruleta.', 'warning');
+                return;
+            }
+            questions.splice(index, 1);
+            saveQuestionsToStorage();
+            renderQuestionsList();
+            drawWheel();
+            showToast('Pregunta eliminada.', 'info');
+        }
+
+        // Reiniciar intento diario (Modo Demo)
+        function resetDailySpin() {
+            localStorage.removeItem('daily_wheel_last_spin');
+            localStorage.removeItem('daily_wheel_today_question');
+            resultCard.classList.add('hidden');
+            updateSpinButtonState(false);
+            showToast('Modo Demo: Giro diario restablecido.', 'info');
+        }
+
+        // Restablecer preguntas por defecto
+        function restoreDefaultQuestions() {
+            questions = [...defaultQuestions];
+            saveQuestionsToStorage();
+            renderQuestionsList();
+            drawWheel();
+            showToast('Se restablecieron las 10 preguntas por defecto.', 'info');
+        }
+
+        // Helper para mostrar notificaciones estilo Toast
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.textContent = message;
+
+            if (type === 'success') {
+                toastIcon.className = 'fas fa-check-circle text-emerald-400';
+            } else if (type === 'warning') {
+                toastIcon.className = 'fas fa-exclamation-triangle text-amber-400';
+            } else if (type === 'error') {
+                toastIcon.className = 'fas fa-times-circle text-rose-400';
+            } else {
+                toastIcon.className = 'fas fa-info-circle text-indigo-400';
+            }
+
+            toast.classList.remove('translate-x-full');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // Escape de caracteres HTML por seguridad
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
 </body>
 </html>
