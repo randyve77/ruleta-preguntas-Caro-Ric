@@ -149,14 +149,13 @@
     <button id="spinBtn" onclick="spin()">¡Girar Ruleta!</button>
 
     <div id="resultCard" class="result-card">
-        <h2>Tu pregunta de hoy:</h2>
+        <h2>Pregunta seleccionada:</h2>
         <p id="questionDisplay"></p>
         <button class="copy-btn" onclick="copyQuestion()">Copiar pregunta</button>
     </div>
 </div>
 
 <script>
-    // Lista completa original de preguntas
     const allQuestions = [
         "¿Qué te hizo sonreír hoy?",
         "¿Qué desafío superaste esta semana?",
@@ -180,13 +179,11 @@
     function init() {
         loadAvailableQuestions();
         drawWheel();
-        checkDailySpin();
     }
 
     function loadAvailableQuestions() {
         let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
         
-        // Filtramos las que ya salieron
         activeQuestions = allQuestions.filter(q => !used.includes(q));
 
         // Si ya se usaron todas, reiniciamos el ciclo automáticamente
@@ -208,7 +205,6 @@
         for (let i = 0; i < numOptions; i++) {
             const angle = i * arcSize;
             
-            // Dibujar sector
             ctx.beginPath();
             ctx.fillStyle = colors[i % colors.length];
             ctx.moveTo(radius, radius);
@@ -216,7 +212,6 @@
             ctx.lineTo(radius, radius);
             ctx.fill();
 
-            // Dibujar texto
             ctx.save();
             ctx.translate(radius, radius);
             ctx.rotate(angle + arcSize / 2);
@@ -233,12 +228,8 @@
     }
 
     function spin() {
-        const today = new Date().toDateString();
-        const lastSpin = localStorage.getItem('last_spin_date');
-
-        if (lastSpin === today) {
-            alert("Ya giraste la ruleta el día de hoy. ¡Vuelve mañana!");
-            return;
+        if (activeQuestions.length === 0) {
+            loadAvailableQuestions();
         }
 
         spinBtn.disabled = true;
@@ -259,32 +250,17 @@
             questionDisplay.textContent = selectedQuestion;
             resultCard.style.display = 'flex';
 
-            // Guardamos la fecha de hoy
-            localStorage.setItem('last_spin_date', today);
-            localStorage.setItem('today_question', selectedQuestion);
-            
             // Guardamos esta pregunta en la lista de usadas para que no vuelva a aparecer
             let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
             used.push(selectedQuestion);
             localStorage.setItem('used_questions', JSON.stringify(used));
+
+            // Recargamos la lista activa y redibujamos la ruleta sin la pregunta seleccionada
+            loadAvailableQuestions();
+            drawWheel();
             
-            spinBtn.innerText = "Giro realizado hoy";
+            spinBtn.disabled = false;
         }, 4000);
-    }
-
-    function checkDailySpin() {
-        const today = new Date().toDateString();
-        const lastSpin = localStorage.getItem('last_spin_date');
-
-        if (lastSpin === today) {
-            spinBtn.disabled = true;
-            spinBtn.innerText = "Giro realizado hoy";
-            const savedQuestion = localStorage.getItem('today_question');
-            if (savedQuestion) {
-                questionDisplay.textContent = savedQuestion;
-                resultCard.style.display = 'flex';
-            }
-        }
     }
 
     function copyQuestion() {
