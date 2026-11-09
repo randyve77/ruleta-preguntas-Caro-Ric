@@ -156,7 +156,7 @@
 </div>
 
 <script>
-    const allQuestions = [
+    const questions = [
         "¿Cuál es tu comida favorita y qué alimento podrías comer todos los días?",
         "¿Cuál es un recuerdo de la infancia que siempre te hace sonreír o que desearías volver a vivir?",
         "¿Cuál es un cumplido o elogio que todavía recuerdas?",
@@ -173,7 +173,6 @@
 
     const colors = ["#4f46e5", "#06b6d4", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#3b82f6"];
     let currentAngle = 0;
-    let activeQuestions = [];
 
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
@@ -182,25 +181,14 @@
     const questionDisplay = document.getElementById('questionDisplay');
 
     function init() {
-        loadAvailableQuestions();
         drawWheel();
     }
 
-    function loadAvailableQuestions() {
-        let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
-        
-        activeQuestions = allQuestions.filter(q => !used.includes(q));
-
-        // Si ya se usaron todas, reiniciamos el ciclo automáticamente
-        if (activeQuestions.length === 0) {
-            localStorage.removeItem('used_questions');
-            activeQuestions = [...allQuestions];
-        }
-    }
-
     function drawWheel() {
-        const numOptions = activeQuestions.length;
+        const numOptions = questions.length;
         if (numOptions === 0) return;
+
+        let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
 
         const arcSize = (2 * Math.PI) / numOptions;
         const radius = canvas.width / 2;
@@ -209,22 +197,27 @@
 
         for (let i = 0; i < numOptions; i++) {
             const angle = i * arcSize;
-            
+            const q = questions[i];
+            const isUsed = used.includes(q);
+
+            // Dibujar sector (Gris si ya se usó, color normal si está disponible)
             ctx.beginPath();
-            ctx.fillStyle = colors[i % colors.length];
+            ctx.fillStyle = isUsed ? "#334155" : colors[i % colors.length];
             ctx.moveTo(radius, radius);
             ctx.arc(radius, radius, radius, angle, angle + arcSize);
             ctx.lineTo(radius, radius);
             ctx.fill();
 
+            // Dibujar texto
             ctx.save();
             ctx.translate(radius, radius);
             ctx.rotate(angle + arcSize / 2);
             ctx.textAlign = "right";
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 11px sans-serif";
+            // Texto más tenue y gris si ya fue usada
+            ctx.fillStyle = isUsed ? "#64748b" : "#fff";
+            ctx.font = isUsed ? "10px sans-serif" : "bold 11px sans-serif";
 
-            let text = activeQuestions[i];
+            let text = q;
             if (text.length > 18) text = text.substring(0, 16) + '...';
 
             ctx.fillText(text, radius - 15, 4);
@@ -233,16 +226,26 @@
     }
 
     function spin() {
-        if (activeQuestions.length === 0) {
-            loadAvailableQuestions();
+        let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
+        
+        // Obtener solo las preguntas que todavía NO han salido
+        let availableQuestions = questions.filter(q => !used.includes(q));
+
+        // Si ya se usaron todas, reiniciamos el ciclo automáticamente
+        if (availableQuestions.length === 0) {
+            localStorage.removeItem('used_questions');
+            used = [];
+            availableQuestions = [...questions];
+            drawWheel();
         }
 
         spinBtn.disabled = true;
 
-        const numOptions = activeQuestions.length;
-        const selectedIndex = Math.floor(Math.random() * numOptions);
-        const selectedQuestion = activeQuestions[selectedIndex];
+        // Elegir una pregunta aleatoria exclusivamente de las disponibles
+        const selectedQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+        const selectedIndex = questions.indexOf(selectedQuestion);
         
+        const numOptions = questions.length;
         const arcSize = 360 / numOptions;
         const targetAngle = 360 - (selectedIndex * arcSize) - (arcSize / 2) - 90; 
         const extraRotations = 5 * 360; 
@@ -255,13 +258,11 @@
             questionDisplay.textContent = selectedQuestion;
             resultCard.style.display = 'flex';
 
-            // Guardamos esta pregunta en la lista de usadas para que no vuelva a aparecer
-            let used = JSON.parse(localStorage.getItem('used_questions') || '[]');
+            // Guardar la pregunta en usadas
             used.push(selectedQuestion);
             localStorage.setItem('used_questions', JSON.stringify(used));
 
-            // Recargamos la lista activa y redibujamos la ruleta sin la pregunta seleccionada
-            loadAvailableQuestions();
+            // Redibujar la ruleta para que se marque en gris la que acaba de salir
             drawWheel();
             
             spinBtn.disabled = false;
